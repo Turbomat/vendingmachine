@@ -10,24 +10,26 @@ body {
     margin-bottom: 10px;
 }
 
-.btn-group{
-	display: flex;
-	flex-direction: column;
-}
-.btn-group button {
-	background-color: #04AA6D; /* Green background */
-	border: 1px solid green; /* Green border */
-	color: white; /* White text */
-	padding: 10px 24px; /* Some padding */
-	cursor: pointer; /* Pointer/hand icon */
-	display: block; /* Make the buttons appear below each other */
+
+
+.empty{
+	width: 20%;
+	background: white;
+	border: black;
+	color: black;
 }
 
-.btn-group button:not(:last-child) {
-	border-bottom: none; /* Prevent double borders */
+.full{
+	width: 20%;
+	background: black;
+	border: black;
+	color: white;
 }
 
-/* Add a background color on hover */
-.btn-group button:hover {
-	background-color: #3e8e41;
+div.ClearButton
+{
+	vertical-align: top;
+	display: inline-block;
+	overflow: hidden;
 }
+

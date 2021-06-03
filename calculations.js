@@ -2,27 +2,10 @@
 //const faces = require("./face-definitions");
 //const face = require("./face");
 
-const beersInShaft = {
-    s1: 0,
-    s2: 0,
-    s3: 0,
-    s4: 0,
-    s5: 0,
-};
-
-beersInShaft.s1 = 28;
 
 const interval = 1;
 let lastCalculated = new Date();
 
-function setBeerInShaft(a,b,c,d,e){
-    beersInShaft.s1 = a;
-    beersInShaft.s2 = b;
-    beersInShaft.s3 = c;
-    beersInShaft.s4 = d;
-    beersInShaft.s5 = e;
-
-}
 
 function interpret(sensorData) {
     let message = "";
@@ -31,34 +14,19 @@ function interpret(sensorData) {
     const currentHour = now.getHours();
 
     if (sensorData.pin === 2) {
-        if(beersInShaft.s1 > 0){
-            beersInShaft.s1--;
-            console.log("One Beer out of Shaft 1. Beers Left: " + beersInShaft.s1);
-        }
+        Shaft1.update();
     }
     if (sensorData.pin === 4) {
-        if(beersInShaft.s2 > 0){
-            beersInShaft.s2--;
-            console.log("One Beer out of Shaft 2. Beers Left: " + beersInShaft.s2);
-        }
+        Shaft2.update();
     }
     if (sensorData.pin === 7) {
-        if(beersInShaft.s3 > 0){
-            beersInShaft.s3--;
-            console.log("One Beer out of Shaft 3. Beers Left: " + beersInShaft.s3);
-        }
+        Shaft3.update();
     }
     if (sensorData.pin === 8) {
-        if(beersInShaft.s4 > 0){
-            beersInShaft.s4--;
-            console.log("One Beer out of Shaft 4. Beers Left: " + beersInShaft.s4);
-        }
+        Shaft4.update();
     }
     if (sensorData.pin === 12) {
-        if(beersInShaft.s5 > 0){
-            beersInShaft.s5--;
-            console.log("One Beer out of Shaft 5. Beers Left: " + beersInShaft.s5);
-        }
+        Shaft5.update();
     }
 
     /*else if (sensorData.celsius > 25) {

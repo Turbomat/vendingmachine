@@ -1,6 +1,81 @@
 let beerChart;
 let alternativeChart;
 
+//Edit Button
+const input_buttons = document.getElementById("btns");
+const edit_button = document.getElementById("edit-button");
+const end_button = document.getElementById("end-editing");
+
+
+class Shaft{
+    amount;
+    amountArray = Array.from(Array(29).keys());
+    buttons;
+
+    constructor(name) {
+        this.name = name;
+    }
+
+    setBeerInShaft(amount){
+        this.amount = amount;
+    }
+
+    createButtons(){
+        for (var i=0; i < this.amountArray.length; i++){
+            this.buttons = $('<div></div>');
+            this.buttons.html("<input class = 'empty' type='button' id='buttons_"+i+"' value='" + this.amountArray[i] + "'/>");
+            $("#btns").append(this.buttons);
+        }
+    }
+
+    update(){
+        if(this.amount > 0){
+            this.amount--;
+            console.log("One Beer out of " + this.name + ". Beers Left: " + this.amount);
+        }
+    }
+}
+
+//Create Shaft-Objects
+const Shaft1 = new Shaft();
+const Shaft2 = new Shaft();
+const Shaft3 = new Shaft();
+const Shaft4 = new Shaft();
+const Shaft5 = new Shaft();
+
+
+function updateShaftBtns(value){
+    for (var i=0; i <= value; i++) {
+            document.getElementById("buttons_" + i + "").classList.add('full');
+    }
+    for (var j = 28; j > value; j--) {
+        document.getElementById("buttons_" + j + "").classList.remove('full');
+    }
+}
+
+Shaft1.createButtons();
+
+$('#btns').on('click', 'input', function(e){
+    console.log("click: ", e.target.value);
+    Shaft1.setBeerInShaft(e.target.value);
+    updateShaftBtns(Shaft1.amount);
+    console.log("shaft1: "+Shaft1.amount);
+});
+
+
+edit_button.addEventListener("click", function() {
+    console.log("hallloo");
+    input_buttons.enabled = "enabled";
+    input_buttons.style.backgroundColor = "#dddbdb";
+});
+
+end_button.addEventListener("click", function() {
+    console.log("tschüüüss");
+    input_buttons.disabled = "disabled";
+    input_buttons.style.backgroundColor = "#ffe44d";
+});
+
+
 function update(response) {
     response.entries.forEach(data => {
 
