@@ -11,6 +11,7 @@ class Shaft{
     amount;
     amountArray = Array.from(Array(29).keys());
     buttons;
+    name;
 
     constructor(name) {
         this.name = name;
@@ -21,10 +22,10 @@ class Shaft{
     }
 
     createButtons(){
-        for (var i=0; i < this.amountArray.length; i++){
+        for (var i=this.amountArray.length-1; i >0; i--){
             this.buttons = $('<div></div>');
-            this.buttons.html("<input class = 'empty' type='button' id='buttons_"+i+"' value='" + this.amountArray[i] + "'/>");
-            $("#btns").append(this.buttons);
+            this.buttons.html("<input class = 'empty btnAmount' type='button' data-shaftId='"+this.name+"' id='buttons_"+i+"_"+this.name+"' value='" + this.amountArray[i] + "'/>");
+            $("#btns"+this.name).append(this.buttons);
         }
     }
 
@@ -37,33 +38,51 @@ class Shaft{
 }
 
 //Create Shaft-Objects
-const Shaft1 = new Shaft();
-const Shaft2 = new Shaft();
-const Shaft3 = new Shaft();
-const Shaft4 = new Shaft();
-const Shaft5 = new Shaft();
+const Shaft1 = new Shaft(1);
+const Shaft2 = new Shaft(2);
+const Shaft3 = new Shaft(3);
+const Shaft4 = new Shaft(4);
+const Shaft5 = new Shaft(5);
 
 
-function updateShaftBtns(value){
-    for (var i=0; i <= value; i++) {
-            document.getElementById("buttons_" + i + "").classList.add('full');
+function updateShaftBtns(shaftID, value){
+    console.log(value)
+    for (var i=1; i <= parseInt(value); i++) {
+        console.log("buttons_" + i + "_" + shaftID);
+        //var btns = document.getElementById("btns"+shaftID+"");
+        document.getElementById("buttons_" + i + "_" + shaftID).classList.add('full');
+
     }
-    for (var j = 28; j > value; j--) {
-        document.getElementById("buttons_" + j + "").classList.remove('full');
-    }
+    for (var j = 28; j > parseInt(value); j--) {
+        document.getElementById("buttons_" + j + "_" + shaftID).classList.remove('full');    }
 }
 
 Shaft1.createButtons();
+Shaft2.createButtons();
+Shaft3.createButtons();
+Shaft4.createButtons();
+Shaft5.createButtons();
 
+/*
 $('#btns').on('click', 'input', function(e){
     console.log("click: ", e.target.value);
     Shaft1.setBeerInShaft(e.target.value);
     updateShaftBtns(Shaft1.amount);
     console.log("shaft1: "+Shaft1.amount);
+});*/
+
+$('.btnAmount').on('click', function(e){
+    console.log(e.target.getAttribute('data-shaftId'), e.target.value);
+
+    $.post( "/vendingmachine-data?" + $.param({
+        shaft: e.target.getAttribute('data-shaftId'),
+        amount: e.target.value
+    }));
+
+    getData();
 });
 
-
-edit_button.addEventListener("click", function() {
+/*edit_button.addEventListener("click", function() {
     console.log("hallloo");
     input_buttons.enabled = "enabled";
     input_buttons.style.backgroundColor = "#dddbdb";
@@ -73,36 +92,52 @@ end_button.addEventListener("click", function() {
     console.log("tschüüüss");
     input_buttons.disabled = "disabled";
     input_buttons.style.backgroundColor = "#ffe44d";
-});
-
+});*/
 
 function update(response) {
     response.entries.forEach(data => {
-
         const time = new Date(data.timestamp);
         const stamp = time.getTime();
-
-
         // Adds points to the charts using the Highcharts library
         beerChart.series[0].addPoint([stamp, data.pin], false, false);
         alternativeChart.series[0].addPoint([stamp, data.pin], false, false);
     });
-
     // Redraw the charts each time update is called
     beerChart.redraw();
     alternativeChart.redraw();
 }
 
-// Get the data from the API
+function updateShafts(response) {
+
+    Object.keys(response).forEach(shaftId => {
+        console.log(shaftId);
+        console.log(response[shaftId]);
+        updateShaftBtns(shaftId, response[shaftId])
+    });
+}
+
 function getData() {
     $.ajax({
-        url: "/vendingmachine-data",
-        success: update
+        url: "/vendingmachine-data"
+    }).done(function( response ) {
+        updateShafts(response);
+    });
+}
+
+// Get the data from the API
+function getLog() {
+    $.ajax({
+        url: "/vendingmachine-log"
+    }).done(function( response ) {
+        //console.log( msg );
+        update(response);
     });
 }
 
 // Sets up the charts from the High Charts library
 function initChart() {
+
+    console.log("hey");
     beerChart = Highcharts.chart("schacht", {
         chart: { type: "spline" },
         title: { text: "BeerPin" },
@@ -191,8 +226,11 @@ function initChart() {
     });
 
 
+    getLog();
+    setInterval(getLog, 5000);
+
     getData();
-    setInterval(getData, 5000);
+    setInterval(getData, 1000);
 }
 
 $(initChart);
