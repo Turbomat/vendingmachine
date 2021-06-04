@@ -48,10 +48,46 @@ function start() {
         response.sendFile(`${__dirname}/public/index.html`);
     });
 
+
+    // Posting on: /vendingmachine-data?shaft=1
+
+    app.post("/vendingmachine-data", (request, response) => {
+        var id = request.query.shaft;
+        var amount = request.query.amount;
+
+        //file lesen
+        fs.readFile("./database.json", "utf-8", (err, data) => {
+            if (err) return console.log(err);
+
+            var newData = JSON.parse(data);
+
+            newData[id] = amount;
+
+            // Stringify object then save back to log file
+            fs.writeFile("./database.json", JSON.stringify(newData), "utf8", err => {
+                if (err) return console.log(err);
+                console.log(`${newData}`);
+            });
+            response.status(200).send();
+
+        });
+    });
+
     // Return log file as JSON
     app.get("/vendingmachine-data", (request, response) => {
         response.setHeader("Content-Type", "application/json");
 
+        // Read JSON file
+        fs.readFile("./database.json", "utf-8", (err, data) => {
+            if (err) return console.log(err);
+
+            // Send response
+            response.send(data);
+        });
+    });
+
+    app.get("/vendingmachine-log", (request, response) => {
+        response.setHeader("Content-Type", "application/json");
         // Read JSON file
         fs.readFile("./log.json", "utf-8", (err, data) => {
             if (err) return console.log(err);

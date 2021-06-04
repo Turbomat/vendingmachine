@@ -6,7 +6,6 @@
 const interval = 1;
 let lastCalculated = new Date();
 
-
 function interpret(sensorData) {
     let message = "";
     let emotion = "neutral";
