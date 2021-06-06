@@ -41,9 +41,10 @@ display: flex;
 .shaft-container{
 	width: 20%;
 	padding: 0 20px;
-
+	height: 100vh;
 }
 
 .btnAmount{
+	height: 3.5vh;
 }
 

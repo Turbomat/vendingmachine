@@ -1,12 +1,6 @@
 let beerChart;
 let alternativeChart;
 
-//Edit Button
-const input_buttons = document.getElementById("btns");
-const edit_button = document.getElementById("edit-button");
-const end_button = document.getElementById("end-editing");
-
-
 class Shaft{
     amount;
     amountArray = Array.from(Array(29).keys());
@@ -15,10 +9,6 @@ class Shaft{
 
     constructor(name) {
         this.name = name;
-    }
-
-    setBeerInShaft(amount){
-        this.amount = amount;
     }
 
     createButtons(){
@@ -37,40 +27,23 @@ class Shaft{
     }
 }
 
-//Create Shaft-Objects
-const Shaft1 = new Shaft(1);
-const Shaft2 = new Shaft(2);
-const Shaft3 = new Shaft(3);
-const Shaft4 = new Shaft(4);
-const Shaft5 = new Shaft(5);
+// Create Shaft-Objects & Buttons
+var shafts = []
+for (var i = 0; i < 6; i++) {
+    shafts.push(new Shaft(i+1));
+    shafts[i].createButtons();
+}
 
-
+// Update Button-Appearance with Data from Backend database.json
 function updateShaftBtns(shaftID, value){
-    console.log(value)
     for (var i=1; i <= parseInt(value); i++) {
-        console.log("buttons_" + i + "_" + shaftID);
-        //var btns = document.getElementById("btns"+shaftID+"");
         document.getElementById("buttons_" + i + "_" + shaftID).classList.add('full');
-
     }
     for (var j = 28; j > parseInt(value); j--) {
         document.getElementById("buttons_" + j + "_" + shaftID).classList.remove('full');    }
 }
 
-Shaft1.createButtons();
-Shaft2.createButtons();
-Shaft3.createButtons();
-Shaft4.createButtons();
-Shaft5.createButtons();
-
-/*
-$('#btns').on('click', 'input', function(e){
-    console.log("click: ", e.target.value);
-    Shaft1.setBeerInShaft(e.target.value);
-    updateShaftBtns(Shaft1.amount);
-    console.log("shaft1: "+Shaft1.amount);
-});*/
-
+// Update Backend database.json with Data from GUI-Inputs
 $('.btnAmount').on('click', function(e){
     console.log(e.target.getAttribute('data-shaftId'), e.target.value);
 
@@ -82,24 +55,18 @@ $('.btnAmount').on('click', function(e){
     getData();
 });
 
-/*edit_button.addEventListener("click", function() {
-    console.log("hallloo");
-    input_buttons.enabled = "enabled";
-    input_buttons.style.backgroundColor = "#dddbdb";
-});
-
-end_button.addEventListener("click", function() {
-    console.log("tschüüüss");
-    input_buttons.disabled = "disabled";
-    input_buttons.style.backgroundColor = "#ffe44d";
-});*/
-
+// Update Charts with Data from Backend log.json
 function update(response) {
+    // Update charts
     response.entries.forEach(data => {
         const time = new Date(data.timestamp);
-        const stamp = time.getTime();
+        const stamp = time.getDay();
         // Adds points to the charts using the Highcharts library
         beerChart.series[0].addPoint([stamp, data.pin], false, false);
+        beerChart.series[1].addPoint([stamp, data.pin], false, false);
+        beerChart.series[2].addPoint([stamp, data.pin], false, false);
+        beerChart.series[3].addPoint([stamp, data.pin], false, false);
+        beerChart.series[4].addPoint([stamp, data.pin], false, false);
         alternativeChart.series[0].addPoint([stamp, data.pin], false, false);
     });
     // Redraw the charts each time update is called
@@ -107,15 +74,15 @@ function update(response) {
     alternativeChart.redraw();
 }
 
+// Update Frontend with Fill-level of each Shaft with Data from database.json
 function updateShafts(response) {
 
     Object.keys(response).forEach(shaftId => {
-        console.log(shaftId);
-        console.log(response[shaftId]);
         updateShaftBtns(shaftId, response[shaftId])
     });
 }
 
+// Get the data from the API
 function getData() {
     $.ajax({
         url: "/vendingmachine-data"
@@ -137,15 +104,35 @@ function getLog() {
 // Sets up the charts from the High Charts library
 function initChart() {
 
-    console.log("hey");
     beerChart = Highcharts.chart("schacht", {
         chart: { type: "spline" },
-        title: { text: "BeerPin" },
+        title: { text: "Beer Consumption" },
         xAxis: { type: "datetime" },
+        yAxis: {
+            title: {
+                text: 'Beerconsumption in Cans'
+            },
+            min: 0
+        },
         series: [{
-            name: "%",
+            name: "Quöllfrisch",
             data: []
-        }]
+        }, {
+            name: "Feldschlösschen",
+            data: []
+        }, {
+            name: "Chopf ab",
+            data: [
+            ]
+        }, {
+            name: "Anker",
+            data: [
+            ]
+        }, {
+            name: "Mate",
+            data: [
+            ]
+            }]
     });
 
     alternativeChart = Highcharts.chart("schachtt", {
@@ -158,17 +145,13 @@ function initChart() {
         subtitle: {
             text: 'by alec hehe'
         },
-        xAxis: {
-            type: "datetime",
-            dateTimeLabelFormats: { // don't display the dummy year
-                day: '',
-                month: '%e. %b',
-                year: '%b'
-            },
-            title: {
-                text: 'Date'
+        xAxis:[{
+            labels:{
+                formatter:function(){
+                    return Highcharts.dateFormat('%Y %M %d',this.value);
+                }
             }
-        },
+        }],
         yAxis: {
             title: {
                 text: 'Beerconsumption in Cans'
@@ -202,7 +185,6 @@ function initChart() {
         }, {
             name: "Chopf ab",
             data: [
-                [Date.UTC(1971, 4, 25), 0]
             ]
         }],
 
@@ -224,7 +206,6 @@ function initChart() {
         }
 
     });
-
 
     getLog();
     setInterval(getLog, 5000);

@@ -17,7 +17,40 @@ function updateData(sensorData) {
         // Add timestamp property to received sensorData object
         sensorData.timestamp = now;
 
-        // Read existing log file
+        var slotNumber;
+
+        if (sensorData.pin === 2) {
+            slotNumber = 1;
+        }
+        if (sensorData.pin === 4) {
+            slotNumber = 2;
+        }
+        if (sensorData.pin === 7) {
+            slotNumber = 3;
+        }
+        if (sensorData.pin === 8) {
+            slotNumber = 4;
+        }
+        if (sensorData.pin === 12) {
+            slotNumber = 5;
+        }
+
+        // Update database.json where a Beer left the Shaft
+        fs.readFile("./database.json", "utf-8", (err, data) => {
+            if (err) return console.log(err);
+
+            var newData = JSON.parse(data);
+
+            newData[slotNumber] -= 1;
+
+            // Stringify object then save back to log file
+            fs.writeFile("./database.json", JSON.stringify(newData), "utf8", err => {
+                if (err) return console.log(err);
+                console.log(`New data: ${newData}`);
+            });
+        });
+
+        // Save Value into log.json
         fs.readFile("./log.json", "utf-8", (err, data) => {
             if (err) return console.log(err);
 
@@ -49,8 +82,7 @@ function start() {
     });
 
 
-    // Posting on: /vendingmachine-data?shaft=1
-
+    // Update database with data from Frontend
     app.post("/vendingmachine-data", (request, response) => {
         var id = request.query.shaft;
         var amount = request.query.amount;
@@ -66,7 +98,7 @@ function start() {
             // Stringify object then save back to log file
             fs.writeFile("./database.json", JSON.stringify(newData), "utf8", err => {
                 if (err) return console.log(err);
-                console.log(`${newData}`);
+                console.log(`New data: ${newData}`);
             });
             response.status(200).send();
 
@@ -85,7 +117,6 @@ function start() {
             response.send(data);
         });
     });
-
     app.get("/vendingmachine-log", (request, response) => {
         response.setHeader("Content-Type", "application/json");
         // Read JSON file
