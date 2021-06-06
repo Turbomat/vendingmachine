@@ -2,7 +2,6 @@ let beerChart;
 let alternativeChart;
 
 class Shaft{
-    amount;
     amountArray = Array.from(Array(29).keys());
     buttons;
     name;
@@ -16,13 +15,6 @@ class Shaft{
             this.buttons = $('<div></div>');
             this.buttons.html("<input class = 'empty btnAmount' type='button' data-shaftId='"+this.name+"' id='buttons_"+i+"_"+this.name+"' value='" + this.amountArray[i] + "'/>");
             $("#btns"+this.name).append(this.buttons);
-        }
-    }
-
-    update(){
-        if(this.amount > 0){
-            this.amount--;
-            console.log("One Beer out of " + this.name + ". Beers Left: " + this.amount);
         }
     }
 }

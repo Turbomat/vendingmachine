@@ -17,6 +17,24 @@ function updateData(sensorData) {
         // Add timestamp property to received sensorData object
         sensorData.timestamp = now;
 
+        // Save SensorData into log.json
+        fs.readFile("./log.json", "utf-8", (err, data) => {
+            if (err) return console.log(err);
+
+            // Parse content of file to JavaScript object
+            const log = JSON.parse(data);
+
+            // Push new data to the array
+            log.entries.push(sensorData);
+
+            // Stringify object then save back to log file
+            fs.writeFile("./log.json", JSON.stringify(log), "utf8", err => {
+                if (err) return console.log(err);
+                console.log(`Logged data: ${now}`);
+            });
+        });
+
+    // Update database.json from which Shaft a Beer has left
         var slotNumber;
 
         if (sensorData.pin === 2) {
@@ -35,7 +53,7 @@ function updateData(sensorData) {
             slotNumber = 5;
         }
 
-        // Update database.json where a Beer left the Shaft
+
         fs.readFile("./database.json", "utf-8", (err, data) => {
             if (err) return console.log(err);
 
@@ -47,23 +65,6 @@ function updateData(sensorData) {
             fs.writeFile("./database.json", JSON.stringify(newData), "utf8", err => {
                 if (err) return console.log(err);
                 console.log(`New data: ${newData}`);
-            });
-        });
-
-        // Save Value into log.json
-        fs.readFile("./log.json", "utf-8", (err, data) => {
-            if (err) return console.log(err);
-
-            // Parse content of file to JavaScript object
-            const log = JSON.parse(data);
-
-            // Push new data to the array
-            log.entries.push(sensorData);
-
-            // Stringify object then save back to log file
-            fs.writeFile("./log.json", JSON.stringify(log), "utf8", err => {
-                if (err) return console.log(err);
-                console.log(`Logged data: ${now}`);
             });
         });
     }
@@ -82,7 +83,7 @@ function start() {
     });
 
 
-    // Update database with data from Frontend
+    // Update database.json with data from Frontend
     app.post("/vendingmachine-data", (request, response) => {
         var id = request.query.shaft;
         var amount = request.query.amount;
@@ -105,7 +106,7 @@ function start() {
         });
     });
 
-    // Return log file as JSON
+    // Send data to front end
     app.get("/vendingmachine-data", (request, response) => {
         response.setHeader("Content-Type", "application/json");
 
